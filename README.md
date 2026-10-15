@@ -20,6 +20,39 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment variables
+
+Add the following values to `.env.local` before connecting the application to its services:
+
+```env
+MONGODB_URI=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_CLOUD_NAME=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXTAUTH_SECRET=
+```
+
+Use `connectDB` from `src/lib/mongodb.ts` to connect to MongoDB. Use `getCloudinaryClient` or `uploadImage` from `src/lib/cloudinary.ts` for server-side Cloudinary access. Google OAuth credentials are required for Google sign-in; configure the Google OAuth redirect URI as `http://localhost:3000/api/auth/callback/google` for local development. Set `NEXTAUTH_SECRET` to a random secret for signed sessions.
+
+## API
+
+All API routes are under `/api`. Google and email/password sign-in use NextAuth at `/api/auth/*`. Manual registration is available at `POST /api/auth/register`; passwords are hashed before storage. New Google accounts must choose an available username with `PATCH /api/users/me` before creating posts, commenting, liking, or following.
+
+| Endpoint | Methods | Purpose |
+| --- | --- | --- |
+| `/api/users/me` | `GET`, `PATCH` | Current profile; complete username setup or update profile |
+| `/api/users/username?username=...` | `GET` | Check username availability |
+| `/api/users/[username]` | `GET` | Public user profile and post collections |
+| `/api/users/[username]/follow` | `POST` | Toggle follow status |
+| `/api/search?q=...` | `GET` | Search users and posts |
+| `/api/posts` | `GET`, `POST` | Ranked, paginated feed; create a post |
+| `/api/posts/[postId]` | `GET`, `PATCH`, `DELETE` | Read or manage a post |
+| `/api/posts/[postId]/like` | `POST` | Toggle a like |
+| `/api/posts/[postId]/comments` | `GET`, `POST` | List or add threaded comments |
+| `/api/comments/[commentId]` | `PATCH`, `DELETE` | Edit or delete a comment and its replies |
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
